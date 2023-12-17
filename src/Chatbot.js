@@ -5,9 +5,34 @@ import { Link } from 'react-router-dom';
 
 const api_key = process.env.REACT_APP_OPENAI_API_KEY; // API 키 환경 변수에서 로드
 
-const Message = ({ isUser, text }) => (
-  <div className={`message ${isUser ? 'user' : 'gpt'}`}>{text}</div>
-);
+const Message = ({ isUser, text }) => {
+  const formatText = (text) => {
+    // 코드 블록과 문단을 분리
+    const parts = text.split(/(```.*?```)/gs).map((part, index) => {
+      if (part.startsWith("```") && part.endsWith("```")) {
+        // 코드 블록 처리
+        return <pre key={index}><code>{part.slice(3, -3)}</code></pre>;
+      } else {
+        // 일반 텍스트와 번호 매기기
+        return part.split(/\n/).map((line, lineIndex) => {
+          if (line.match(/^\d+\./)) {
+            // 번호 매기기 리스트 아이템 처리
+            return <p key={`${index}-${lineIndex}`}><strong>{line}</strong></p>;
+          }
+          return <p key={`${index}-${lineIndex}`}>{line}</p>;
+        });
+      }
+    });
+    
+    return parts;
+  };
+
+  return (
+    <div className={`message ${isUser ? 'user' : 'gpt'}`}>
+      {formatText(text)}
+    </div>
+  );
+};
 
 const MessageList = ({ messages }) => {
     const messagesEndRef = useRef(null); // 스크롤 이동을 위한 ref 생성
@@ -69,12 +94,13 @@ const Chatbot = () => {
 
       const chatMessages = newMessages.map((m) => ({
         role: m.isUser ? 'user' : 'assistant',
-        content: m.text,
+        content: `${m.text}에 대한 답변을 생성해줘. 가독성을 위해 답변을 1.~, 2.~ 형태로 번호를 달아서 생성해줘. 그리고 문단을 띄워줘.`
       }));
 
       const requestBody = {
         model: "gpt-3.5-turbo",
-        messages: newMessages.map(m => ({role: m.isUser ? 'user' : 'assistant', content: m.text})),
+        //messages: newMessages.map(m => ({role: m.isUser ? 'user' : 'assistant', content: chatMessages})),
+        messages: chatMessages,
         //max_tokens: 300,
       };
   
@@ -95,6 +121,13 @@ const Chatbot = () => {
           setMessages(updatedMessages);
           setShouldFetchSummary(true);
           localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: data.choices[0].message.content, isUser: false }]));
+
+          if(Notification.permission === 'granted'){
+            new Notification("새로운 메시지가 도착했습니다.", {
+              body: data.choices[0].message.content,
+              icon: '/path/to/icon.png'
+            });
+          }
         } else {
           // API로부터 유효한 응답을 받지 못했을 때 처리
           console.error('Invalid response from the API:', data);
@@ -157,6 +190,7 @@ const Chatbot = () => {
     }
   };
 
+
   const clearAll = () => {
     setMessages([]);
     setSummaries([]);
@@ -180,6 +214,9 @@ const Chatbot = () => {
   }, []);
   
   useEffect(() => {
+    if(Notification.permission === 'default'){
+      Notification.requestPermission();
+    }
     if(shouldFetchSummary && messages.length > 0){
       const lastMessageText = messages[messages.length -1].text;
       fetchSummary(lastMessageText);
