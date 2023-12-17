@@ -193,3 +193,24 @@
     font-family: 'Courier New', monospace; /* 모노스페이스 폰트 */
     white-space: pre; /* 공백과 줄바꿈 유지 */
   }
+
+  .button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  
+  .button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+  }
