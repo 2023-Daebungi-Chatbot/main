@@ -201,26 +201,26 @@ const Chatbot = () => {
           setShouldFetchSummary(true);
           localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: data.choices[0].message.content, isUser: false }]));
 
-          if(Notification.permission === 'granted'){
+          // 데스크톱 알림 기능이 있는지 확인하고, 데스크톱 환경인 경우에만 알림 표시
+        if ('Notification' in window && window.innerWidth > 768) {
+          if (Notification.permission === 'granted') {
             new Notification("새로운 메시지가 도착했습니다.", {
               body: data.choices[0].message.content,
               icon: '/path/to/icon.png'
             });
           }
-        } else {
-          // API로부터 유효한 응답을 받지 못했을 때 처리
-          console.error('Invalid response from the API:', data);
         }
-      } catch (error) {
-        // 네트워크 오류 또는 요청 실패 시 처리
-        console.error('Error sending message:', error);
+      } else {
+        // API로부터 유효한 응답을 받지 못했을 때의 처리
+        console.error('Invalid response from the API:', data);
       }
-
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
 
-    
-  };
+    setIsLoading(false);
+  }
+};
 
   const lastMessage = messages[messages.length -1]?.text;
 
