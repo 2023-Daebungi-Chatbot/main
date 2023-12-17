@@ -142,3 +142,39 @@
       font-size: 0.9em;
     }
   }
+
+  .nav {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.9em;
+  }
+  
+  .nav a {
+    display: inline-block;
+    padding: 8px 18px;
+    margin: 0px;
+    background-color: #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .nav a:hover {
+    background-color: #e0e0e0;
+  }
+
+  .clear-button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #ff4d4d; /* 빨간색 배경 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  
+  .clear-button:hover {
+    background-color: #ff3333; /* 호버 효과 */
+  }

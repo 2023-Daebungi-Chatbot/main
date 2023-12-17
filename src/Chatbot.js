@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {useEffect, useRef} from 'react';
 import './Chatbot.scss';
+import { Link } from 'react-router-dom';
 
 const api_key = process.env.REACT_APP_OPENAI_API_KEY; // API 키 환경 변수에서 로드
 
@@ -73,8 +74,8 @@ const Chatbot = () => {
 
       const requestBody = {
         model: "gpt-3.5-turbo",
-        messages: chatMessages,
-        max_tokens: 300,
+        messages: newMessages.map(m => ({role: m.isUser ? 'user' : 'assistant', content: m.text})),
+        //max_tokens: 300,
       };
   
       try {
@@ -90,8 +91,10 @@ const Chatbot = () => {
         const data = await response.json();
 
         if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-          setMessages([...newMessages, { text: data.choices[0].message.content, isUser: false }]);
+          const updatedMessages = [...newMessages, { text: data.choices[0].message.content, isUser: false }];
+          setMessages(updatedMessages);
           setShouldFetchSummary(true);
+          localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: data.choices[0].message.content, isUser: false }]));
         } else {
           // API로부터 유효한 응답을 받지 못했을 때 처리
           console.error('Invalid response from the API:', data);
@@ -103,20 +106,23 @@ const Chatbot = () => {
 
       setIsLoading(false);
     }
+
+    
   };
 
   const lastMessage = messages[messages.length -1]?.text;
 
   const fetchSummary = async () => {
+    setSummaries(prevSummaries => [...prevSummaries, {loading: true, text: "요약을 생성중입니다.."}]);
     const summaryMessages = [{
       role: 'assistant',
-      content: `${lastMessage}를 세 문장 이내로 요약해줘.`
+      content: `${lastMessage}를 3 문장 이내로 요약해줘.`
     }];
   
     const summaryRequestBody = {
       model: "gpt-3.5-turbo",
       messages: summaryMessages,
-      max_tokens: 150,
+      //max_tokens: 150,
     };
 
     try {
@@ -131,8 +137,18 @@ const Chatbot = () => {
 
       const summaryData = await summaryResponse.json();
 
-      if(summaryData.choices && summaryData.choices.length > 0 && summaryData.choices[0].message){
-        setSummaries(prevSummaries => [...prevSummaries, { text: summaryData.choices[0].message.content }]);
+      if (summaryData.choices && summaryData.choices.length > 0 && summaryData.choices[0].message) {
+        // 요약 상태 업데이트
+        setSummaries(prevSummaries => {
+          const updatedSummaries = prevSummaries.map((summary, index) => 
+            index === prevSummaries.length - 1 
+              ? { loading: false, text: summaryData.choices[0].message.content }
+              : summary
+          );
+          // 로딩 메시지를 제외한 상태를 로컬 스토리지에 저장
+          localStorage.setItem('chatSummaries', JSON.stringify(updatedSummaries.filter(s => !s.loading)));
+          return updatedSummaries;
+        });
       } else{
         console.error('Invalid response from summary API:',summaryData);
       }
@@ -140,6 +156,28 @@ const Chatbot = () => {
       console.error('Error sending summary Message: ',error);
     }
   };
+
+  const clearAll = () => {
+    setMessages([]);
+    setSummaries([]);
+
+    localStorage.removeItem('chatMessages');
+    localStorage.removeItem('chatSummaries');
+  };
+
+  useEffect(() => {
+    // 대화 내용 로드
+    const savedMessages = localStorage.getItem('chatMessages');
+    if(savedMessages){
+      setMessages(JSON.parse(savedMessages));
+    }
+
+    // 요약 카드 로드
+    const savedSummaries = localStorage.getItem('chatSummaries');
+    if (savedSummaries) {
+      setSummaries(JSON.parse(savedSummaries));
+    }
+  }, []);
   
   useEffect(() => {
     if(shouldFetchSummary && messages.length > 0){
@@ -152,16 +190,21 @@ const Chatbot = () => {
 
   return (
     <div className="chatbot">
+      <div className="nav">
+      <Link to="/">Home</Link>
+      <br></br>
+      <button onClick={clearAll} className="clear-button">Clean</button>
+      </div>
     <div className="chat-container">
       <MessageList messages={messages} />
       <InputBox onSendMessage={handleSendMessage} />
-      {isLoading && <div className="loading">답변을 생성 중입니다...</div>}
+      {isLoading && <div className="loading">답변을 생성중입니다...</div>}
     </div>
       <div className="summary-container">
         {summaries.map((summary, index) => (
           <div className="summary" key={index}>
             <h4>GPT 답변 요약 - {index+1} </h4>
-            <p>{summary.text}</p>
+            <p>{summary.loading ? summary.text : summary.text}</p>
           </div>
         ))}
       </div>
