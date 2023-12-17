@@ -24,6 +24,7 @@
 .summary-container {
   max-height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .chat-container{
@@ -96,6 +97,7 @@
 
   .loading {
     margin-top: 10px;
+    text-align: left;
     top: 100%;
     left: 10%;
     font-size: 15px;

@@ -160,7 +160,7 @@ const Chatbot = () => {
       <div className="summary-container">
         {summaries.map((summary, index) => (
           <div className="summary" key={index}>
-            <h3>요약: </h3>
+            <h4>GPT 답변 요약 - {index+1} </h4>
             <p>{summary.text}</p>
           </div>
         ))}
