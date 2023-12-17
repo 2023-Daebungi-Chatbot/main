@@ -1,0 +1,38 @@
+.home-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+  
+    .logo {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+    }
+  
+    .site-name {
+      font-size: 1.5em;
+      margin-bottom: 0.25em;
+    }
+  
+    .welcome-message {
+      font-size: 1.2em;
+      margin-bottom: 2em;
+    }
+  
+    .enter-button {
+      padding: 1em 2em;
+      font-size: 1em;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+  
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
