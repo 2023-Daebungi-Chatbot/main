@@ -15,7 +15,7 @@ function Nav(){
         <div>
             <div className='navbar' style={{background: `linear-gradient(to bottom right, rgb(50, 155, 50), ${color})`}}>
                 <Link className='navbarMenu' to={'/'}>
-                    <img className='logoImage' src={logo_negative} width='120' height='80'/>
+                    <img className='logoImage' src={logo_negative} width='100' height='100'/>
                 </Link>
                 <Link className='navbarMenuCenter' to={'/'}>
                     <img className='logoImage' src={web_name} width='350' height='45'/>
