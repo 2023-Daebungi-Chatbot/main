@@ -153,7 +153,7 @@ const Chatbot = () => {
 
   const sendLogToServer = async (messages) => {
     try {
-        await fetch('http://127.0.0.1:8080/save-log', {
+        await fetch('http://3.106.145.76:8080/save-log', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
