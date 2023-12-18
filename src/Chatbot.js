@@ -151,6 +151,20 @@ const Chatbot = () => {
   const [shouldFetchSummary, setShouldFetchSummary] = useState(false);
   const [inputType, setInputType] = useState('text');
 
+  const sendLogToServer = async (messages) => {
+    try {
+        await fetch('http://127.0.0.1:80/save-log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ messages })
+        });
+    } catch (error) {
+        console.error('Error sending log to server:', error);
+    }
+};
+
   const handleSendMessage = async (text) => {
     if (text.trim()) {
       const newMessages = [...messages, { text, isUser: true }];
@@ -180,6 +194,9 @@ const Chatbot = () => {
 
       console.log({chatMessages});
 
+      const recentMessage = newMessages.slice(-1)[0]; //log 저장
+      await sendLogToServer(recentMessage);
+
       const requestBody = {
         model: "ft:gpt-3.5-turbo-0613:shinkisa::8Wn3OFbA",
         //messages: newMessages.map(m => ({role: m.isUser ? 'user' : 'assistant', content: chatMessages})),
@@ -203,6 +220,10 @@ const Chatbot = () => {
           const updatedMessages = [...newMessages, { text: data.choices[0].message.content, isUser: false }];
           setMessages(updatedMessages);
           setShouldFetchSummary(true);
+
+          const recentGPTMessage = updatedMessages.slice(-1)[0]; //log 저장
+          await sendLogToServer(recentGPTMessage);
+
           localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: data.choices[0].message.content, isUser: false }]));
 
           // 데스크톱 알림 기능이 있는지 확인하고, 데스크톱 환경인 경우에만 알림 표시
@@ -297,6 +318,9 @@ const Chatbot = () => {
           const fallbackMessages = [...messages, fallbackMessage];
           localStorage.setItem('chatMessages', JSON.stringify(fallbackMessages));
           setMessages(fallbackMessages);
+
+          const recentfallbackMessage = fallbackMessages.slice(-1)[0]; //log 저장
+          await sendLogToServer(recentfallbackMessage);
         } else {
           console.error('Error while saving to localStorage:', error);
         }
@@ -339,6 +363,9 @@ const Chatbot = () => {
           };
           setMessages(prevMessages => [...prevMessages, descriptionMessage]);
           localStorage.setItem('chatMessages', JSON.stringify([...updatedMessages, descriptionMessage]));     
+
+          const recentGPTimageMessage = updatedMessages.slice(-1)[0]; //log 저장
+          await sendLogToServer(recentGPTimageMessage);
         } else {
           console.error('Invalid response from the API:', data);
         }
