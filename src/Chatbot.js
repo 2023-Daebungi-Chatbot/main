@@ -350,11 +350,17 @@ const Chatbot = () => {
   };
 
   const clearAll = () => {
-    setMessages([]);
-    setSummaries([]);
-
-    localStorage.removeItem('chatMessages');
-    localStorage.removeItem('chatSummaries');
+    // 사용자에게 확인 요청
+    const confirmClear = window.confirm("모든 대화 기록을 삭제하시겠습니까?");
+  
+    // 사용자가 '확인'을 누른 경우
+    if (confirmClear) {
+      setMessages([]);
+      setSummaries([]);
+  
+      localStorage.removeItem('chatMessages');
+      localStorage.removeItem('chatSummaries');
+    }
   };
 
   useEffect(() => {
@@ -362,6 +368,14 @@ const Chatbot = () => {
     const savedMessages = localStorage.getItem('chatMessages');
     if(savedMessages){
       setMessages(JSON.parse(savedMessages));
+    } else {
+      // 로컬 스토리지에 저장된 메시지가 없을 경우, 초기 메시지 설정
+      const initialMessage = {
+        text: "안녕하세요! 무엇을 도와드릴까요?",
+        isUser: false,
+        type: 'text'
+      };
+      setMessages([initialMessage]);
     }
 
     // 요약 카드 로드
