@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {useEffect, useRef} from 'react';
 import './Chatbot.scss';
 import { Link } from 'react-router-dom';
+import Nav from './components/Nav';
 
 const api_key = process.env.REACT_APP_OPENAI_API_KEY; // API 키 환경 변수에서 로드
 const isMobileDevice = () => {
@@ -401,27 +402,31 @@ const Chatbot = () => {
 
 
   return (
-    <div className="chatbot">
+    <div>
+      <Nav/>
       <div className="nav">
-      <Link to="/">Home</Link>
-      <br></br>
-      <button onClick={clearAll} className="clear-button">Clean</button>
+        <Link to="/">Home</Link>
+        <br></br>
+        <button onClick={clearAll} className="clear-button">Clean</button>
       </div>
-    <div className="chat-container">
-      <MessageList messages={messages} />
-      {inputType === 'text' ?
-      <TextInputBox onSendMessage={handleSendMessage} setInputType={setInputType}/> :
-      <ImageInputBox onSendImage={handleImageUpload} setInputType={setInputType}/>
-    }
-      {isLoading && <div className="loading">답변을 생성중입니다...</div>}
-    </div>
-      <div className="summary-container">
-        {summaries.map((summary, index) => (
-          <div className="summary" key={index}>
-            <h4>GPT 답변 요약 - {index+1} </h4>
-            <p>{summary.loading ? summary.text : summary.text}</p>
-          </div>
-        ))}
+      <div className="chatbot">
+
+        <div className="chat-container">
+          <MessageList messages={messages} />
+          {inputType === 'text' ?
+          <TextInputBox onSendMessage={handleSendMessage} setInputType={setInputType}/> :
+          <ImageInputBox onSendImage={handleImageUpload} setInputType={setInputType}/>
+        }
+          {isLoading && <div className="loading">답변을 생성중입니다...</div>}
+        </div>
+        <div className="summary-container">
+          {summaries.map((summary, index) => (
+            <div className="summary" key={index}>
+              <h4>GPT 답변 요약 - {index+1} </h4>
+              <p>{summary.loading ? summary.text : summary.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
