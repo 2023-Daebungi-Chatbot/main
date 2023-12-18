@@ -4,6 +4,9 @@ import './Chatbot.scss';
 import { Link } from 'react-router-dom';
 
 const api_key = process.env.REACT_APP_OPENAI_API_KEY; // API 키 환경 변수에서 로드
+const isMobileDevice = () => {
+  return /Mobi|Android/i.test(navigator.userAgent);
+};
 
 const Message = ({ isUser, text, type }) => {
   // URL을 찾아 하이퍼링크로 변환
@@ -202,7 +205,7 @@ const Chatbot = () => {
           localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: data.choices[0].message.content, isUser: false }]));
 
           // 데스크톱 알림 기능이 있는지 확인하고, 데스크톱 환경인 경우에만 알림 표시
-        if ('Notification' in window && window.innerWidth > 768) {
+        if (!isMobileDevice() && typeof Notification !== 'undefined') {
           if (Notification.permission === 'granted') {
             new Notification("새로운 메시지가 도착했습니다.", {
               body: data.choices[0].message.content,
@@ -279,8 +282,27 @@ const Chatbot = () => {
         type: 'image'
       };
       const updatedMessages = [...messages, newMessage];
+
+      try {
+        localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
+      } catch (error) {
+        if(error.name === 'QuotaExceededError'){
+          console.error('로컬 스토리지 용량 초과:',error);
+          const fallbackMessage = {
+            text: 'image', // 이미지 URL 대신 'image' 문자열 저장
+            isUser: true,
+            type: 'text'
+          };
+          const fallbackMessages = [...messages, fallbackMessage];
+          localStorage.setItem('chatMessages', JSON.stringify(fallbackMessages));
+          setMessages(fallbackMessages);
+        } else {
+          console.error('Error while saving to localStorage:', error);
+        }
+      }
+
       setMessages(updatedMessages);
-      localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
+      //localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
       setIsLoading(true);
 
       const requestBody = {
@@ -350,9 +372,10 @@ const Chatbot = () => {
   }, []);
   
   useEffect(() => {
+    if(!isMobileDevice()){
     if(Notification.permission === 'default'){
       Notification.requestPermission();
-    }
+    } }
     if(shouldFetchSummary && messages.length > 0){
       const lastMessageText = messages[messages.length -1].text;
       fetchSummary(lastMessageText);

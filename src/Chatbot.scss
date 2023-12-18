@@ -214,3 +214,30 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
   }
+
+@media (max-width: 768px) {
+  .chatbot{
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .message{
+    max-width: 100%;
+  }
+
+  .input-box{
+    overflow-x: auto;
+  }
+
+  .nav, .clear-button {
+    top: 120%;
+    display: inline-flex;
+  }
+
+  .clear-button {
+    margin-left: 10px;
+    margin-top: 0px;
+  }
+
+}
