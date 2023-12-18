@@ -216,10 +216,26 @@
   }
 
 @media (max-width: 768px) {
+
+  .summary-container{
+    overflow-y: auto;
+    height: 50vh;
+  }
+
   .chatbot{
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     width: 100%;
+    height: 80%;
+    margin-top: 20%;
+    overflow: auto;
+  }
+
+  
+
+  .chat-container, .summary-container{
+    flex: 1;
   }
 
   .message{
@@ -231,7 +247,8 @@
   }
 
   .nav, .clear-button {
-    top: 120%;
+    top: 0px;
+    margin-top: 20px;
     display: inline-flex;
   }
 
