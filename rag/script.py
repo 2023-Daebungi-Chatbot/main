@@ -6,7 +6,7 @@ import constants
 
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import faiss
+from langchain.vectorstores import FAISS 
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
@@ -17,10 +17,10 @@ query = sys.argv[1]
 
 #should add constants.py to .gitignore
 os.environ["OPENAI_API_KEY"] = constants.OPENAI_API_KEY
-openai = ChatOpenAI(model="gpt-3.5-turbo-1106")
+openai = ChatOpenAI(model="gpt-4")
 
 embedding_model = OpenAIEmbeddings()
-loaded_vectors = faiss.load_vectors("embeddings_qna", embedding_model)
+loaded_vectors = FAISS.load_local("embeddings_qna", embedding_model)
 retriever = loaded_vectors.as_retriever()
 
 RAG_PROMPT = """
@@ -42,5 +42,5 @@ response = rag_chain.invoke(query)
 data = {}
 data['answer'] = response
 
-with open('data.json', 'w', encoding='utf-8') as f:
-    json.dump(data, f, indent=4)
+with open('data.json', 'w', encoding='utf-8-sig') as f:
+    json.dump(data, f, indent=4, ensure_ascii=False)
