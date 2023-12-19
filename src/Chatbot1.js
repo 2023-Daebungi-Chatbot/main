@@ -26,20 +26,14 @@ const Message = ({ isUser, text, type }) => {
     });
   };
 
-
-
-
+  // 코드 블록, 문단 분리, URL 링크 처리 및 번호 목록 굵게 표시
   const formatText = (text) => {
-    if (typeof text !== 'string') {
-      // 만약 text가 문자열이 아니라면 적절하게 처리하세요 (예: 오류 메시지 반환 또는 다른 방식으로 처리)
-      return <p>Error: 잘못된 텍스트 형식</p>;
-    }
-  
     return text.split(/(```.*?```)/gs).map((part, index) => {
       if (part.startsWith("```") && part.endsWith("```")) {
         return <pre key={index}><code>{part.slice(3, -3)}</code></pre>;
       } else {
         return part.split(/\n/).map((line, lineIndex) => {
+          // 번호 목록 감지 및 굵게 표시
           if (line.match(/^\d+\./)) {
             return <p key={`${index}-${lineIndex}`}><strong>{formatLink(line)}</strong></p>;
           }
@@ -48,24 +42,6 @@ const Message = ({ isUser, text, type }) => {
       }
     });
   };
-  
-
-  // // 코드 블록, 문단 분리, URL 링크 처리 및 번호 목록 굵게 표시
-  // const formatText = (text) => {
-  //   return text.split(/(```.*?```)/gs).map((part, index) => {
-  //     if (part.startsWith("```") && part.endsWith("```")) {
-  //       return <pre key={index}><code>{part.slice(3, -3)}</code></pre>;
-  //     } else {
-  //       return part.split(/\n/).map((line, lineIndex) => {
-  //         // 번호 목록 감지 및 굵게 표시
-  //         if (line.match(/^\d+\./)) {
-  //           return <p key={`${index}-${lineIndex}`}><strong>{formatLink(line)}</strong></p>;
-  //         }
-  //         return <p key={`${index}-${lineIndex}`}>{formatLink(line)}</p>;
-  //       });
-  //     }
-  //   });
-  // };
 
   const renderContent = () => {
     if (type === 'image') {
@@ -174,32 +150,27 @@ const Chatbot = () => {
   const [summaries, setSummaries] = useState([]);
   const [shouldFetchSummary, setShouldFetchSummary] = useState(false);
   const [inputType, setInputType] = useState('text');
-  const [serverData, setServerData] = useState(null);
 
   const sendLogToServer = async (messages) => {
-    console.log("찐짜 ㅆㅂ", messages);
-   
-  
     try {
-        await fetch('http://0.0.0.0:8000/save-log', {
+        await fetch('http://3.106.145.76:8080/save-log', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({messages})  // 수정된 부분
+            body: JSON.stringify({ messages })
         });
     } catch (error) {
         console.error('Error sending log to server:', error);
     }
 };
 
-
   const handleSendMessage = async (text) => {
     if (text.trim()) {
       const newMessages = [...messages, { text, isUser: true }];
       setMessages(newMessages);
       setIsLoading(true);
-      
+
       const chatMessages = newMessages.slice(-2).map((m) => {
         if (m.isUser) {
           let content;
@@ -222,61 +193,52 @@ const Chatbot = () => {
       });
 
       console.log({chatMessages});
-      
 
-      const sendChatMessagesToServer = async (chatMessages) => {
-   
-        try {
-          const textData = chatMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
-          const question = await fetch('http://0.0.0.0:8000/chat2', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text_data: textData }),
-          });
-      
-          if (!question.ok) {
-            throw new Error('서버 응답이 실패했습니다.');
-          }
-          
-          const serverData = await question.json();
-          console.log('서버 응답:', serverData);
-          setServerData(serverData);
-          return serverData;
+      const recentMessage = newMessages.slice(-1)[0]; //log 저장
+      await sendLogToServer(recentMessage);
 
-        } catch (error) {
-          console.error('서버와의 통신 중 오류 발생:', error.message);
-          return null;
-        }
+      const requestBody = {
+        model: "ft:gpt-3.5-turbo-0613:shinkisa::8Wn3OFbA",
+        //messages: newMessages.map(m => ({role: m.isUser ? 'user' : 'assistant', content: chatMessages})),
+        messages: chatMessages,
+        //max_tokens: 300,
       };
-
+      
       try {
-   
-        const data = await sendChatMessagesToServer(chatMessages);
-        console.log('서버 응답2:', data);
-        console.log('데이터 타입:', typeof data);
-        const Textdata = JSON.stringify(data);
-        const rangchainAnswer= Textdata.replace('{"answer":"', '').replace('"}', '');
-        const updatedMessages = [...newMessages, { text: rangchainAnswer}];
-        setMessages(updatedMessages);
-        setShouldFetchSummary(true);
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: "Bearer " + api_key,
+          },
+          body: JSON.stringify(requestBody),
+        });
 
-        const recentGPTMessage = updatedMessages; //log 저장
-        await sendLogToServer(recentGPTMessage);
+        const data = await response.json();
 
-        localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: rangchainAnswer }]));
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+          const updatedMessages = [...newMessages, { text: data.choices[0].message.content, isUser: false }];
+          setMessages(updatedMessages);
+          setShouldFetchSummary(true);
 
-        // 데스크톱 알림 기능이 있는지 확인하고, 데스크톱 환경인 경우에만 알림 표시
-      if (!isMobileDevice() && typeof Notification !== 'undefined') {
-        if (Notification.permission === 'granted') {
-          new Notification("새로운 메시지가 도착했습니다.", {
-            body: data.choices[0].message.content,
-            icon: '/path/to/icon.png'
-          });
+          const recentGPTMessage = updatedMessages.slice(-1)[0]; //log 저장
+          await sendLogToServer(recentGPTMessage);
+
+          localStorage.setItem('chatMessages', JSON.stringify([...newMessages, { text: data.choices[0].message.content, isUser: false }]));
+
+          // 데스크톱 알림 기능이 있는지 확인하고, 데스크톱 환경인 경우에만 알림 표시
+        if (!isMobileDevice() && typeof Notification !== 'undefined') {
+          if (Notification.permission === 'granted') {
+            new Notification("새로운 메시지가 도착했습니다.", {
+              body: data.choices[0].message.content,
+              icon: '/path/to/icon.png'
+            });
+          }
         }
-        }
- 
+      } else {
+        // API로부터 유효한 응답을 받지 못했을 때의 처리
+        console.error('Invalid response from the API:', data);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -295,8 +257,7 @@ const Chatbot = () => {
     }];
   
     const summaryRequestBody = {
-      //model: "ft:gpt-3.5-turbo-0613:shinkisa::8Wn3OFbA",
-      model: "gpt-4",
+      model: "ft:gpt-3.5-turbo-0613:shinkisa::8Wn3OFbA",
       messages: summaryMessages,
       //max_tokens: 150,
     };
