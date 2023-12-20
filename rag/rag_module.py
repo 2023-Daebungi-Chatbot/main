@@ -19,7 +19,7 @@ def generate_rag_response(query):
     RAG_PROMPT = """
     CONTEXT: {context}
     QUERY: {question}
-    Use the provided context to answer the provided user query. If you don't find the relevant answer in context, then find the answer from LLM. You are a friendly chatbot that answers to Korean students, so you should answer in Korean. Please do not tell the students to ask questions to the professor.
+    Use the provided context to answer the provided user query. If you don't find the relevant answer in context, then find the answer from LLM. You are a friendly chatbot that answers to Korean students, so you should answer in Korean. Please do not tell the students to ask questions to the professor. If there is a python code or shell command in the answer, please provide it as a code block using ```.
     """
 
     rag_prompt = ChatPromptTemplate.from_template(RAG_PROMPT)
