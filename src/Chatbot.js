@@ -36,20 +36,22 @@ const Message = ({ isUser, text, type }) => {
     }
   
     return text.split(/(```.*?```)/gs).map((part, index) => {
-      if (part && part.startsWith("```") && part.endsWith("```")) {
+      if (part.startsWith("```") && part.endsWith("```")) {
+        // 코드 블록 내의 줄바꿈을 <br />로 바꾸기
         const codeContent = part.slice(3, -3).replace(/\n/g, '<br />');
         return <pre key={index}><code dangerouslySetInnerHTML={{ __html: codeContent }} /></pre>;
-      } 
-      else if (part === '\n') {
-        return <br key={index} />;
-      } 
-      else {
-        return part.split(/\n/).map((line, lineIndex) => {
-          if (line.match(/^\d+\./)) {
-            return <p key={`${index}-${lineIndex}`}><strong>{formatLink(line)}</strong></p>;
+      } else {
+        // 일반 텍스트에서 줄바꿈 문자를 <br/>로 바꾸기
+        const lines = part.split(/\n/).reduce((acc, line, lineIndex) => {
+          if (line !== '') {
+            acc.push(<span key={`${index}-${lineIndex}`}>{formatLink(line)}</span>);
           }
-          return <p key={`${index}-${lineIndex}`}>{formatLink(line)}</p>;
-        });
+          acc.push(<br key={`br-${index}-${lineIndex}`} />);
+          return acc;
+        }, []);
+  
+        lines.pop();
+        return lines;
       }
     });
   };
@@ -182,7 +184,9 @@ const Chatbot = () => {
   const [serverData, setServerData] = useState(null);
 
   const sendLogToServer = async (messages) => {
+    console.log("찐짜 ㅆㅂ", messages);
    
+  
     try {
         await fetch('http://0.0.0.0:8000/save-log', {
             method: 'POST',
