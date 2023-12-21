@@ -188,7 +188,7 @@ const Chatbot = () => {
    
   
     try {
-        await fetch('http://0.0.0.0:8000/save-log', {
+        await fetch('http://3.106.145.76:8000/save-log', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -235,7 +235,7 @@ const Chatbot = () => {
    
         try {
           const textData = chatMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
-          const question = await fetch('http://0.0.0.0:8000/chat2', {
+          const question = await fetch('http://3.106.145.76:8000/chat2', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
