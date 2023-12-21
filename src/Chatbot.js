@@ -36,9 +36,14 @@ const Message = ({ isUser, text, type }) => {
     }
   
     return text.split(/(```.*?```)/gs).map((part, index) => {
-      if (part.startsWith("```") && part.endsWith("```")) {
-        return <pre key={index}><code>{part.slice(3, -3)}</code></pre>;
-      } else {
+      if (part && part.startsWith("```") && part.endsWith("```")) {
+        const codeContent = part.slice(3, -3).replace(/\n/g, '<br />');
+        return <pre key={index}><code dangerouslySetInnerHTML={{ __html: codeContent }} /></pre>;
+      } 
+      else if (part === '\n') {
+        return <br key={index} />;
+      } 
+      else {
         return part.split(/\n/).map((line, lineIndex) => {
           if (line.match(/^\d+\./)) {
             return <p key={`${index}-${lineIndex}`}><strong>{formatLink(line)}</strong></p>;
@@ -177,9 +182,7 @@ const Chatbot = () => {
   const [serverData, setServerData] = useState(null);
 
   const sendLogToServer = async (messages) => {
-    console.log("찐짜 ㅆㅂ", messages);
    
-  
     try {
         await fetch('http://0.0.0.0:8000/save-log', {
             method: 'POST',
