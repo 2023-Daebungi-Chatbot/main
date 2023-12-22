@@ -24,5 +24,14 @@ yarn-error.log*
 
 #API_KEY
 .env
-/rag/constants.py
+/python_server/constants.py
+
+
+#LOGS
+/node_server/logs
+/python_server/logs
+
+nohup.output
+npm.log
+/python_server/server_python.log
 
