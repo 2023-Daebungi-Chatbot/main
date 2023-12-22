@@ -471,7 +471,50 @@ const Chatbot = () => {
     }
   }, [messages, shouldFetchSummary]);
 
+  //loading animation
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  useEffect(() => {
+    let interval;
+    if (isLoading) {
+      setLoadingProgress(0);
+      interval = setInterval(() => {
+        setLoadingProgress(prev => {
+          const nextProgress = prev + 0.1; // 작은 값으로 더 자주 업데이트
+          if (nextProgress >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return nextProgress;
+        });
+      }, 50); // 50ms마다 실행하여 더 자주 업데이트
+    } else {
+      setLoadingProgress(0);
+    }
   
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isLoading]);
+
+  const LoadingOverlay = ({ isLoading, loadingProgress }) => {
+    if (!isLoading) return null;
+  
+    const maskStyle = {
+      transform: `translateY(${100 - loadingProgress}%)`
+    };
+  
+    return (
+      <div className="loading-overlay">
+        <div className="loading-circle">
+          <div className="loading-mask" style={maskStyle}></div>
+          <span className="loading-text">{`${loadingProgress.toFixed(0)}%`}</span>
+        </div>
+        <div className="loading">답변을 열심히 생성중입니다. 잠시만 기다려주세요!</div>
+      </div>
+    );
+  };
 
 
   return (
@@ -483,6 +526,7 @@ const Chatbot = () => {
         <button onClick={clearAll} className="clear-button">Clean</button>
       </div>
       <div className="chatbot">
+      <LoadingOverlay isLoading={isLoading} loadingProgress={loadingProgress} />
 
         <div className="chat-container">
           <MessageList messages={messages} />
@@ -490,7 +534,7 @@ const Chatbot = () => {
           <TextInputBox onSendMessage={handleSendMessage} setInputType={setInputType}/> :
           <ImageInputBox onSendImage={handleImageUpload} setInputType={setInputType}/>
         }
-          {isLoading && <div className="loading">답변을 생성중입니다...</div>}
+          
         </div>
         <div className="summary-container">
           {summaries.map((summary, index) => (
@@ -500,7 +544,7 @@ const Chatbot = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div>    
     </div>
   );
 };
