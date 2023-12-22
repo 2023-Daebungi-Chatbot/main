@@ -184,9 +184,7 @@ const Chatbot = () => {
   const [serverData, setServerData] = useState(null);
 
   const sendLogToServer = async (messages) => {
-    console.log("찐짜 ㅆㅂ", messages);
    
-  
     try {
         await fetch('http://3.106.145.76:8000/save-log', {
             method: 'POST',
@@ -263,8 +261,10 @@ const Chatbot = () => {
         const data = await sendChatMessagesToServer(chatMessages);
         console.log('서버 응답2:', data);
         console.log('데이터 타입:', typeof data);
-        const Textdata = JSON.stringify(data);
-        const rangchainAnswer= Textdata.replace('{"answer":"', '').replace('"}', '');
+        //const Textdata = JSON.stringify(data);
+        //const rangchainAnswer= Textdata.replace('{"answer":"', '').replace('"}', '');
+        const rangchainAnswer = data.answer ? data.answer : '답변이 없습니다.';
+        console.log('추출된 답변:',rangchainAnswer);
         const updatedMessages = [...newMessages, { text: rangchainAnswer}];
         setMessages(updatedMessages);
         setShouldFetchSummary(true);
