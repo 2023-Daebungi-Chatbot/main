@@ -14,12 +14,12 @@ def generate_rag_response(query):
 
     embedding_model = OpenAIEmbeddings()
     loaded_vectors = FAISS.load_local("embeddings_qna", embedding_model)
-    retriever = loaded_vectors.as_retriever()
+    retriever = loaded_vectors.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .5, "k": 2})
 
     RAG_PROMPT = """
     CONTEXT: {context}
     QUERY: {question}
-    Use the provided context to answer the provided user query. If you don't find the relevant answer in context, then find the answer from LLM. You are a friendly chatbot that answers to Korean students, so by default you should answer in Korean, but if user ask for you to answer in english please do so. Please do not tell the students to ask questions to the professor. If there is a python code or shell command in the answer, please provide it as a code block using ```.
+    주어진 QUERY에 대해서, 관련이 높은 내용이 CONTEXT에 있다면 활용해서 대답해주세요! 경쾌하고 친절하게 대답해주세요! 교수님한테 문의하거나 질문하라고 하지마세요. 답변에 Python코드가 포함되어 있으면 해당 코드 부분을 ```로 감싸주세요. 상세하게 답변해주세요.
     """
 
     rag_prompt = ChatPromptTemplate.from_template(RAG_PROMPT)
