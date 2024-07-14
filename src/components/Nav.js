@@ -8,7 +8,7 @@ import { FaGithub } from "react-icons/fa";
 import { IconContext } from "react-icons";
 
 function Nav(){
-    var git_link = "https://github.com/2023-Daebungi-Chatbot/main";
+    var git_link = "https://github.com/2023-Daebungi-Chatbot/main/tree/paperwithpython";
     var color =  '#016c0a';
 
     return (
@@ -18,7 +18,7 @@ function Nav(){
                     <img className='logoImage' src={logo_negative} width='100' height='100'/>
                 </Link>
                 <Link className='navbarMenuCenter' to={'/'}>
-                    <img className='logoImage' src={web_name} width='350' height='45'/>
+                    <img className='logoImage' src={web_name} width='350' height='80'/>
                 </Link>
                 <Link className='navbarMenu' onClick={() => window.open(git_link)} width='120'>
                     <FaGithub size={45}/>

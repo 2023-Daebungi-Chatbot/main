@@ -3,8 +3,8 @@ import symbolMark from '../img/SymbolMark.png'
 
 const Footer = () => {
     const copyright = String.fromCodePoint(0x00A9);
-    const year = '2023';
-    const companyName = 'DAC';
+    const year = '2024';
+    const companyName = 'SKKU';
 
     var color =  '#016c0a';
 
