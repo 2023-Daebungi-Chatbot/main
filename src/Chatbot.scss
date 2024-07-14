@@ -271,7 +271,37 @@
     display: flex;
     flex-direction: column;
   }
-
+  .summary-container {
+    .help-container {
+      background-color: #f0f8ff; /* Light blue background */
+      padding: 10px; /* Padding around the container */
+      border-radius: 10px; /* Rounded corners */
+      margin-bottom: 10px; /* Space between the help link and the summaries */
+      text-align: center; /* Center align the text */
+    }
+  
+    .help-link {
+      color: #1a73e8; /* Blue text color */
+      font-weight: bold; /* Bold text */
+      text-decoration: none; /* Remove underline */
+      display: inline-block; /* Center align the link inside the container */
+      padding: 5px 10px; /* Padding inside the link */
+      border-radius: 5px; /* Rounded corners for the link */
+      transition: background-color 0.3s; /* Smooth transition for background color */
+    }
+  
+    .help-link:hover {
+      background-color: #e0e0e0; /* Light grey background on hover */
+    }
+  
+    .summary {
+      background-color: #ffffff; /* White background for summaries */
+      padding: 10px; /* Padding inside each summary */
+      border-radius: 10px; /* Rounded corners for summaries */
+      margin-bottom: 10px; /* Space between summaries */
+    }
+  }
+  
 
   .message{
     max-width: 80%;

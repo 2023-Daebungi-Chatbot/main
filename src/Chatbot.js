@@ -537,14 +537,20 @@ const Chatbot = () => {
           
         </div>
         <div className="summary-container">
-          {summaries.map((summary, index) => (
-            <div className="summary" key={index}>
-              <h4>GPT 답변 요약 - {index+1} </h4>
-              <p>{summary.loading ? summary.text : summary.text}</p>
-            </div>
-          ))}
+        <div className="help-container">
+          <p className="help-text">질문이 해결되지 않았다면 오픈채팅방에 남겨 주세요</p>
+          <a href="https://open.kakao.com/o/gxb3FVCg" target="_blank" rel="noopener noreferrer" className="help-link">
+            https://open.kakao.com/o/gxb3FVCg
+          </a>
         </div>
-      </div>    
+        {summaries.map((summary, index) => (
+          <div className="summary" key={index}>
+            <h4>GPT 답변 요약 - {index + 1}</h4>
+            <p>{summary.loading ? summary.text : summary.text}</p>
+          </div>
+        ))}
+      </div>
+      </div>     
     </div>
   );
 };
