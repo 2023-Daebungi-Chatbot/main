@@ -26,7 +26,7 @@ const Home = () => {
   const handleEnter = () => {
     navigate('/chatbot');
   };
-  const welcome_mag = "데이터분석기초 챗봇에 오신걸 환영합니다 🎈\n저는 여러분의 수업을 도와줄 챗봇 DAC라고 합니다.\n 잘 부탁드립니다 :)";
+  const welcome_mag = "논문쓰기 챗봇에 오신걸 환영합니다 🎈\n저는 여러분의 수업을 도와줄 챗봇입니다."
   const [text, setText] = useState('');
   const [count, setCount] = useState(0);
 
@@ -41,14 +41,14 @@ const Home = () => {
     return () => clearInterval(interval);
   })
 
-  var iCampus_link = "https://canvas.skku.edu/courses/46987";
+  var iCampus_link = "https://canvas.skku.edu/courses/52423";
 
   return (
     <div>
       <Nav/>
       <div className="home-container">
         <div className="logo">
-          <img className='logoImage' src={logo} width='450' height='450' />
+          <img className='logoImage' src={logo} width='300' height='300' />
         </div>
         {/* <div className="site-name">Site Name</div> */}
         <div className="welcome-message">{text}</div>
@@ -64,8 +64,8 @@ const Home = () => {
               <Nav/>
               <div className='precaution'>
                 <h2 className='emphasis'>** 주의사항 **</h2>
-                <li className='content'>무분별한 챗봇 사용은 자제해주세요.</li>
                 <li className='content'>챗봇에는 수업과 관련된 내용만 질문해주세요!</li>
+                <li className='content'>챗봇 사용내역은 서버에 저장됩니다.</li>
                 <li className='content'>챗봇은 PC에서 실행해주세요 :)</li>
               </div>
               <div className='tips'>

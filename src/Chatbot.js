@@ -511,7 +511,7 @@ const Chatbot = () => {
           <div className="loading-mask" style={maskStyle}></div>
           <span className="loading-text">{`${loadingProgress.toFixed(0)}%`}</span>
         </div>
-        <div className="loading">답변을 열심히 생성중입니다. 잠시만 기다려주세요!</div>
+        <div className="loading">답변을 생성중입니다. 잠시만 기다려주세요!</div>
       </div>
     );
   };

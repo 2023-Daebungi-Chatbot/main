@@ -11,7 +11,7 @@ import constants  # Assuming constants.py is in the same directory
 
 def generate_rag_response(query):
     os.environ["OPENAI_API_KEY"] = constants.OPENAI_API_KEY
-    openai = ChatOpenAI(model="gpt-4")
+    openai = ChatOpenAI(model="gpt-4o")
 
     embedding_model = OpenAIEmbeddings()
     loaded_vectors = FAISS.load_local("embeddings_qna", embedding_model,allow_dangerous_deserialization = True)
