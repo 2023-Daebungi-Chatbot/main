@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
@@ -6,6 +6,18 @@ import uvicorn
 import os
 from datetime import datetime
 from rag_module import generate_rag_response
+
+from langchain_community.chat_models import ChatOpenAI
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.vectorstores import FAISS
+
+from langchain_community.embeddings import OpenAIEmbeddings
+import tiktoken
+import numpy as np
+from numpy.linalg import norm
+import locale
+import constants
 
 app = FastAPI()
 

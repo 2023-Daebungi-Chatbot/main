@@ -1,8 +1,9 @@
 import os
 import json
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+#from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
@@ -13,7 +14,7 @@ def generate_rag_response(query):
     openai = ChatOpenAI(model="gpt-4")
 
     embedding_model = OpenAIEmbeddings()
-    loaded_vectors = FAISS.load_local("embeddings_qna", embedding_model)
+    loaded_vectors = FAISS.load_local("embeddings_qna", embedding_model,allow_dangerous_deserialization = True)
     retriever = loaded_vectors.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": .5, "k": 2})
 
     RAG_PROMPT = """
@@ -35,4 +36,3 @@ def generate_rag_response(query):
     data['answer'] = response
 
     return data
-
